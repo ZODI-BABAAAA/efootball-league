@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZODIAC HUB - Lig Yönetim Platformu</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="brand-header">
+    <div class="brand-title">ZODIAC HUB</div>
+    <div class="brand-sub">Gelişmiş Lig & Turnuva Yönetim Platformu</div>
+  </div>
+
+  <div class="container">
+
+    <!-- KULLANICI BİLGİ BARI -->
+    <div id="userBar" class="user-bar hidden">
+      <div>Giriş Yapıldı: <b id="barUsername">-</b> (<span id="barId" style="color:var(--accent-gold)">-</span>)</div>
+      <button onclick="cikisYap()" class="btn-secondary" style="width:auto; padding:4px 10px; margin:0; font-size:0.75rem;">Çıkış</button>
+    </div>
+
+    <!-- GİRİŞ EKRANI -->
+    <div id="authScreen" class="glass-card">
+      <h3 style="margin-bottom:15px;">Giriş Yap</h3>
+      
+      <label>Kullanıcı Adı</label>
+      <input type="text" id="authUsername" placeholder="Örn: Kullanıcı123">
+      
+      <label>Gmail Adresi</label>
+      <input type="email" id="authEmail" placeholder="ornek@gmail.com">
+      
+      <label>Şifre</label>
+      <input type="password" id="authPassword" placeholder="••••••••">
+
+      <button onclick="girisYap()">Giriş Yap</button>
+      <button onclick="ekranDegistir('registerScreen')" class="btn-secondary">Kayıt Ol</button>
+    </div>
+
+    <!-- KAYIT OL EKRANI -->
+    <div id="registerScreen" class="glass-card hidden">
+      <h3 style="margin-bottom:15px;">Yeni Hesap Oluştur</h3>
+      
+      <label>Kullanıcı Adı</label>
+      <input type="text" id="regUsername" placeholder="Kullanıcı adınızı seçin">
+      
+      <label>Gmail Adresi</label>
+      <input type="email" id="regEmail" placeholder="ornek@gmail.com">
+      
+      <label>Şifre</label>
+      <input type="password" id="regPassword" placeholder="Şifreniz">
+
+      <button onclick="kayitol()">Hesap Oluştur</button>
+      <button onclick="ekranDegistir('authScreen')" class="btn-secondary">Zaten Hesabım Var (Giriş Yap)</button>
+    </div>
+
+    <!-- TAKIM SEÇME VE PROFİL DÜZENLEME EKRANI -->
+    <div id="teamSetupScreen" class="glass-card hidden">
+      <h3 style="color:var(--accent-gold);">⚙️ Takım Profilini Oluştur</h3>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Lige katıldığında bu bilgiler kullanılacaktır. İstediğin zaman değiştirebilirsin.</p>
+      
+      <label>Takım Adı</label>
+      <input type="text" id="profileTeamName" placeholder="Örn: Zodiac FC">
+
+      <label>Kısaltma Adı (3 Harfli)</label>
+      <input type="text" id="profileTeamShort" maxlength="3" placeholder="Örn: ZDC" style="text-transform: uppercase;">
+
+      <label>Kolektif Güç (Sınırsız - Örn: 3200)</label>
+      <input type="number" id="profileTeamPower" placeholder="Örn: 3200">
+
+      <label>Takım Amblemi (Galeriden Seç)</label>
+      <input type="file" id="profileTeamLogoInput" accept="image/*" onchange="previewLogo(event)">
+      <div style="margin-top:10px; text-align:center;">
+        <small style="color:var(--text-muted); display:block; margin-bottom:5px;">Önizleme (Seçilmezse Gareth Bale varsayılan olur):</small>
+        <img id="logoPreview" src="https://i.ibb.co/L8bZ0Yx/gareth-bale.jpg" class="team-logo-preview" alt="Amblem">
+      </div>
+
+      <button onclick="takimProfiliniKaydet()">Profili Kaydet ve Ana Menüye Geç</button>
+    </div>
+
+    <!-- ANA UYGULAMA PANELİ -->
+    <div id="mainApp" class="hidden">
+      
+      <div class="menu-grid">
+        <button class="menu-btn" onclick="sekmeDegistir('liglerim')">🏆 Liglerim</button>
+        <button class="menu-btn" onclick="sekmeDegistir('ligKur')">➕ Lig Kur</button>
+        <button class="menu-btn" onclick="sekmeDegistir('ligeKatil')">🔑 Lige Katıl</button>
+      </div>
+
+      <!-- LİGLERİM SEKMESİ -->
+      <div id="sec-liglerim" class="glass-card">
+        <h3>Aktif Liglerin</h3>
+        <div id="ligListesi" style="margin-top:12px;"></div>
+      </div>
+
+      <!-- LİG KUR SEKMESİ -->
+      <div id="sec-ligKur" class="glass-card hidden">
+        <h3>Yeni Lig Oluştur</h3>
+        <label>Benzersiz Lig ID</label>
+        <input type="text" id="newLigId" placeholder="Örn: TURK2026">
+        
+        <label>Lig Adı</label>
+        <input type="text" id="newLigName" placeholder="Örn: Şampiyonlar Ligi">
+        
+        <label>Takımların Birbiriyle Oynama Sayısı (Varsayılan: 10)</label>
+        <input type="number" id="newMatchCount" value="10" min="1">
+
+        <button onclick="ligOlustur()">Ligi Başlat</button>
+      </div>
+
+      <!-- LİGE KATIL SEKMESİ -->
+      <div id="sec-ligeKatil" class="glass-card hidden">
+        <h3>Lige Katıl</h3>
+        <label>Katılınacak Lig ID'si</label>
+        <input type="text" id="joinLigId" placeholder="Örn: TURK2026">
+
+        <div style="background:rgba(30, 41, 59, 0.5); padding:10px; border-radius:8px; margin-top:10px; display:flex; align-items:center; gap:10px;">
+          <img id="joinTeamPreviewImg" src="https://i.ibb.co/L8bZ0Yx/gareth-bale.jpg" class="team-logo-small">
+          <div>
+            <small style="color:var(--text-muted)">Katılacağınız Takım Profiliniz:</small>
+            <div id="joinTeamPreview" style="font-weight:bold; margin-top:2px;">Profil Oluşturulmadı</div>
+          </div>
+        </div>
+
+        <button onclick="ligeKatil()" style="margin-top:12px;">Bu Takım İle Lige Dahil Ol</button>
+        <button onclick="ekranDegistir('teamSetupScreen')" class="btn-secondary">Takım Profilini Düzenle</button>
+      </div>
+
+      <!-- LİG DETAY / AKIŞ EKRANI -->
+      <div id="sec-ligDetay" class="glass-card hidden">
+        <button onclick="sekmeDegistir('liglerim')" class="btn-secondary" style="width:auto; padding:5px 12px; font-size:0.8rem;">← Geri</button>
+        
+        <h2 id="activeLigTitle" style="margin-top:10px; color:var(--accent-purple)">-</h2>
+        <p style="font-size:0.8rem; color:var(--text-muted)">Lig ID: <span id="activeLigIdDisplay" style="color:#fff"></span></p>
+
+        <!-- PUAN TABLOSU -->
+        <h4 style="margin-top:18px;">📊 Canlı Puan Tablosu</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Sıra</th>
+              <th>Takım (Kısaltma)</th>
+              <th>Güç</th>
+              <th>O</th>
+              <th>Puan</th>
+            </tr>
+          </thead>
+          <tbody id="puanTablosuBody"></tbody>
+        </table>
+
+        <!-- MAÇ SKORU GİRİŞİ & YENİLENMİŞ CEZA/ÖDÜL PANELİ -->
+        <div id="adminSkorPanel" class="hidden" style="margin-top:15px; background:rgba(30, 41, 59, 0.7); padding:12px; border-radius:10px;">
+          <h5 style="color:var(--accent-gold); margin-bottom:8px;">⚽ Maç Skoru Gir</h5>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+            <select id="skorEvSelect"><option value="">Takım Seçin</option></select>
+            <select id="skorDeplasmanSelect"><option value="">Takım Seçin</option></select>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:5px;">
+            <input type="number" id="skorEvGol" placeholder="Ev Gol" style="margin:0;">
+            <input type="number" id="skorDepGol" placeholder="Dep Gol" style="margin:0;">
+          </div>
+          <button onclick="macSkoruKaydet()" class="btn-success" style="margin-top:8px;">Skoru İşle</button>
+
+          <hr style="border-color: rgba(255,255,255,0.1); margin: 12px 0;">
+
+          <!-- YENİ DETAYLI CEZA / ÖDÜL VERME FORMU -->
+          <h5 style="color:var(--accent-pink); margin-bottom:8px;">⚖️ Takım Puan Ceza / Ödül Ver</h5>
+          
+          <label>Takım Seçin</label>
+          <select id="penaltyTeamSelect"><option value="">Takım Seçin</option></select>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+            <div>
+              <label>İşlem Türü</label>
+              <select id="penaltyType" style="margin:0;">
+                <option value="ödül">➕ Ödül (Ekle)</option>
+                <option value="ceza">➖ Ceza (Kes)</option>
+              </select>
+            </div>
+            <div>
+              <label>Puan Miktarı</label>
+              <input type="number" id="penaltyAmount" placeholder="Örn: 3" min="1" style="margin:0;">
+            </div>
+          </div>
+
+          <label>Neden / Gerekçe</label>
+          <input type="text" id="penaltyReason" placeholder="Örn: Kural ihlali nedeniyle" style="margin-bottom:8px;">
+
+          <button onclick="puanCezasiIsle()" class="btn-secondary" style="background:var(--accent-purple); font-weight:bold;">İşlemi Uygula</button>
+        </div>
+
+        <!-- LİG SOHBETİ -->
+        <h4 style="margin-top:20px;">💬 Canlı Lig Sohbeti</h4>
+        <div class="chat-box" id="chatContainer"></div>
+        <div style="display:flex; gap:6px;">
+          <input type="text" id="chatInput" placeholder="Mesajınızı yazın..." style="margin:0;">
+          <button onclick="mesajGonder()" style="margin:0; width:80px;">Gönder</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- KÜÇÜK GİZLİ SÜPER ADMIN BUTONU -->
+    <div id="zdcAdminTrigger" class="hidden" style="text-align: center; margin-top: 25px;">
+      <button onclick="adminModalAc()" class="admin-mini-btn">⚙️ Admin</button>
+    </div>
+
+  </div>
+
+  <!-- SÜPER ADMIN DÜZENLEME MODALI -->
+  <div id="adminModal" class="modal hidden">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h3 style="color:var(--accent-gold); margin:0;">👑 Süper Admin Yönetim Paneli</h3>
+        <span onclick="adminModalKapat()" style="cursor:pointer; font-weight:bold; font-size:1.2rem;">✖</span>
+      </div>
+      
+      <div id="adminUserList"></div>
+
+      <!-- KULLANICI DÜZENLEME FORMU -->
+      <div id="adminEditForm" class="hidden" style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:15px;">
+        <h4 style="color:var(--accent-purple); margin-bottom:10px;">✏️ Kullanıcıyı Düzenle</h4>
+        
+        <input type="hidden" id="editOriginalUsername">
+        <label>Kullanıcı Adı</label>
+        <input type="text" id="editUsername">
+
+        <label>Gmail</label>
+        <input type="email" id="editEmail">
+
+        <label>Şifre</label>
+        <input type="text" id="editPassword">
+
+        <label>Kullanıcı ID</label>
+        <input type="text" id="editUserId">
+
+        <label>Takım Adı</label>
+        <input type="text" id="editTeamName">
+
+        <label>Takım Kısaltması</label>
+        <input type="text" id="editTeamShort" maxlength="3">
+
+        <label>Kolektif Güç (Sınırsız)</label>
+        <input type="number" id="editTeamPower">
+
+        <button onclick="adminKullaniciKaydet()" class="btn-success">Tüm Değişiklikleri Kaydet</button>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:10px;">
+          <button id="btnToggleAdmin" onclick="adminYetkiDegistir()" class="btn-secondary" style="background:#8b5cf6;">Admin Yap / Kaldır</button>
+          <button id="btnToggleBan" onclick="adminBanDegistir()" class="btn-secondary" style="background:#ef4444;">Banla / Ban Aç</button>
+        </div>
+
+        <button onclick="document.getElementById('adminEditForm').classList.add('hidden')" class="btn-secondary" style="margin-top:8px;">İptal</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
